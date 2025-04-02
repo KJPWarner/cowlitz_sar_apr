@@ -1,0 +1,9 @@
+#ignore files in the RMIS folder
+
+RMIS/
+
+
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
