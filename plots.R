@@ -95,5 +95,14 @@ ggplot(graphic_inputs, aes(x = brood_year, y = mean_sar, color = hatchery, group
   ggtitle("Fall Chinook SAR by Brood Year and Hatchery") +
   theme_minimal()
 
-# close PDF device
+#grouped and tiled barchart by year
+ggplot(fc, aes(x = brood_year, y = percent_rec)) +
+  geom_bar(stat = "identity",
+           aes(fill = fishery_name)
+  ) +
+  facet_wrap(~hatchery) +
+  labs(title = "Proportional Fisheries Exploitation", x = "Brood Year", y = "Recovery by fishery (% current population estimate)") +
+  theme(legend.title = element_blank())#removes title from the legend
+
+#close PDF device
 dev.off()

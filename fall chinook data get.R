@@ -1,7 +1,6 @@
-#########data retreival using two rmis api workarounds
+#########data retreival using two rmis api workarounds, run this script first, then model prep, then plots.r
 remotes::install_github("Ben-Cox/rRMIS")
 devtools::install_github("KJPWarner/RMISr")
-
 
 #list of packages used
 p<- c("dplyr", "RCurl", "purrr", "tibble", "stringr", "DBI", "readr", "rvest", "RSQLite", "lubridate",
@@ -9,7 +8,7 @@ p<- c("dplyr", "RCurl", "purrr", "tibble", "stringr", "DBI", "readr", "rvest", "
       "nortest", "odbc"
 )
 
-#pass list of packages in object p. Then we pass object p using lapply to load required packages
+#pass list of packages in object p, several of these are not used in this analysis
 
 lapply(p, require, character.only = TRUE)
 

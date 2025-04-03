@@ -130,8 +130,8 @@ model_inputs1 <- clean_rec2 |>
 write.csv(model_inputs1,"./outputs/fall chinook locr sar data.csv")
 
 
-#### plots.r contains diagnostic histograms of frequency of sampling errors. 
-#### upon examination, fisheries from CDFO, and returns from Big creek hatchery have been excluded from the analysis
+#### plots.r contains diagnostic histograms of frequency of errors in the sampling data. 
+#### upon examination, fisheries from CDFO, and returns from Big creek hatchery have been excluded from the relative sar analysis
 
 sample_errs <- model_inputs1 |> 
   filter(sample_fraction > 1 | is.na(sample_fraction))
