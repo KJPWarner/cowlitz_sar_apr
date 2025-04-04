@@ -143,7 +143,8 @@ sample_errs3 <- sample_errs2 |>
 ######################## Final clean up and summation for modeling
 
 model_inputs2 <- model_inputs1 |> 
-  filter(!sampling_agency == "CDFO",# problematic factors excluded to not introduce noise into the sar comparison
+  filter(brood_year < 2020, #only include fully reported brood years
+         !sampling_agency == "CDFO",# problematic factors excluded to not introduce noise into the sar comparison
          !hatchery == "BIG CR HATCHERY", # same as above
          mgt_fishery %in% c("Escapement", "Buoy 10 Sport", "Freshwater Net")#chosen recovery strata based on frequency, magnitude, and comparison of Lower columbia hatchery pressures
          ) |> 

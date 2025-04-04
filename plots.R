@@ -77,7 +77,7 @@ ggplot(graphic_inputs, aes(x = brood_year, y = log(mean_sar), color = hatchery, 
   geom_point(size = 3) +
   #scale_color_viridis_d(option = "B", end = 0.9) +
   labs(x = "Brood Year", y = "log-SAR") +
-  ggtitle("Fall Chinook SAR by Brood Year and Hatchery") +
+  ggtitle("Log-transformed Relative Fall Chinook SAR by Brood Year and Hatchery") +
   theme_minimal()
 
 # Plot 7: Colorblind-friendly (log-transformed relative SAR)
@@ -99,7 +99,7 @@ ggplot(graphic_inputs, aes(x = brood_year, y = log(mean_sar), color = hatchery, 
   geom_point(size = 3) +
   scale_color_manual(values = combined_colors) +
   labs(x = "Brood Year", y = "log(SAR)") +
-  ggtitle("Log Transformed Fall Chinook SAR by Brood Year and Hatchery") +
+  ggtitle("Log Transformed Fall Chinook Relative SAR by Brood Year and Hatchery") +
   theme_minimal()
 
 # Plot 7: Colorblind-friendly untransformed SAR
@@ -112,12 +112,25 @@ ggplot(graphic_inputs, aes(x = brood_year, y = mean_sar, color = hatchery, group
   theme_minimal()
 
 #grouped and tiled barchart by year for exploitation rates
-ggplot(fc, aes(x = brood_year, y = percent_rec)) +
+
+fc2 <- fc |>
+  mutate(fishery_name = case_when(fishery_name %in% c("Hake Trawl Fishery, At-Sea component (CA/OR/WA)",
+                                       "Hake Trawl Fishery, Shoreside component (OR/WA)") ~ "Hake Trawl",
+                                  fishery_name %in% c("Sport (charter)",
+                                                      "Sport (private)") ~ "Offshore Sport",
+                                  fishery_name %in% c("Ocean Troll - Day Boat",
+                                                      "Ocean Troll (non-treaty)") ~"Ocean Troll",
+                   TRUE ~ fishery_name))
+  
+ggplot(fc2, aes(x = brood_year, y = percent_rec)) +
   geom_bar(stat = "identity",
            aes(fill = fishery_name)
   ) +
+  scale_fill_viridis_d(option = "C")+
   facet_wrap(~hatchery) +
-  labs(title = "Proportional Fisheries Exploitation", x = "Brood Year", y = "Recovery by fishery (% current population estimate)") +
+  labs(title = "Proportional Fisheries Exploitation",
+       x = "Brood Year", 
+       y = "Recovery by fishery (% total tags recovered by brood year)") +
   theme(legend.title = element_blank())#removes title from the legend
 
 #close PDF device
