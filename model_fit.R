@@ -207,21 +207,6 @@ newdat <-
   mutate(avg_weight = mean(dat$avg_weight, na.rm = T),
          jday = mean(dat$jday))
 
-# # add mean observed values by hatchery / brood year
-# newdat <-
-#   newdat |>
-#   select(-c(avg_weight,
-#             jday)) |>
-#   left_join(dat |>
-#               group_by(hatchery,
-#                        brood_year) |>
-#               summarize(across(c(avg_weight,
-#                                  jday,
-#                                  relative_sar),
-#                                ~ mean(., na.rm = T)),
-#                         .groups = "drop"),
-#             by = join_by(hatchery,
-#                          brood_year))
 
 # Ensure factor variables match the model structure
 identical(levels(dat$hatchery),
@@ -248,8 +233,11 @@ newdat <-
 
 
 # create some plots
+pdf(here("figures",
+         "prediction_plots.pdf"),
+    width = 8,
+    height = 5)
 
-# pdf("plots.pdf", width=8,height=5)
 ggplot(newdat, aes(x = brood_year,
                    y = prediction,
                    color = hatchery_group,
@@ -271,7 +259,11 @@ ggplot(newdat, aes(x = brood_year,
   #                    breaks = scales::breaks_pretty()) +
   theme(legend.position = "right")
 
-ggplot(newdat, aes(x = brood_year, y = prediction, color = hatchery, group = hatchery)) +
+ggplot(newdat, 
+       aes(x = brood_year, 
+           y = prediction, 
+           color = hatchery, 
+           group = hatchery)) +
   geom_line() +  # Line plot to show trends over brood years
   geom_point() + # Add points for individual predictions
   theme_minimal() +
@@ -282,10 +274,47 @@ ggplot(newdat, aes(x = brood_year, y = prediction, color = hatchery, group = hat
   scale_y_log10(breaks = scales::breaks_pretty())+
   theme(legend.position = "right")
 
+dev.off()
+
+
+
+# all_preds <-
+#   dat |> 
+#   bind_cols(predict(model,
+#                     # newdata = newdat,
+#                     type = "response",
+#                     se.fit = T) |>
+#               as_tibble() |>
+#               rename(prediction = fit,
+#                      pred_se = se.fit) |>
+#               mutate(lci = qnorm(0.025, prediction, pred_se),
+#                      uci = qnorm(0.975, prediction, pred_se),
+#                      across(lci,
+#                             ~ case_when(. < 0 ~ 0,
+#                                         .default = .))))
+
+# add mean observed values by hatchery / brood year
 all_preds <-
-  dat |> 
+  newdat |>
+  select(hatchery,
+         hatchery_group,
+         brood_year) |>
+  left_join(dat |>
+              group_by(hatchery,
+                       brood_year) |>
+              summarize(across(c(avg_weight,
+                                 jday,
+                                 relative_sar),
+                               ~ mean(., na.rm = T)),
+                        .groups = "drop"),
+            by = join_by(hatchery,
+                         brood_year)) |> 
+  filter(!is.na(relative_sar))
+
+all_preds <-
+  all_preds |> 
   bind_cols(predict(model,
-                    # newdata = newdat,
+                    newdata = all_preds,
                     type = "response",
                     se.fit = T) |>
               as_tibble() |>
@@ -296,6 +325,13 @@ all_preds <-
                      across(lci,
                             ~ case_when(. < 0 ~ 0,
                                         .default = .))))
+
+
+pdf(here("figures",
+         "diagnostic_plots.pdf"),
+    width = 8,
+    height = 5)
+
 
 ggplot(all_preds,
        aes(x = brood_year,
@@ -312,3 +348,17 @@ ggplot(all_preds,
   ) +
   scale_y_log10(breaks = scales::breaks_pretty())+
   theme(legend.position = "none")
+
+all_preds |> 
+  ggplot(aes(x = relative_sar,
+             y = prediction,
+             color = hatchery_group)) + 
+  geom_abline(linetype = 2) +
+  geom_point(size = 3) +
+  scale_x_log10(breaks = scales::breaks_pretty()) +
+  scale_y_log10(breaks = scales::breaks_pretty()) +
+  labs(x = "Observed Recovery Rate",
+       y = "Predicted Recovery Rate")
+
+
+dev.off()
