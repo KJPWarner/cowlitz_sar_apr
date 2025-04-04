@@ -19,7 +19,7 @@ ggplot(sample_errs, aes(x = sampling_agency)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # Plot 2: Histogram of hatchery counts
-ggplot(sample_errs, aes(x = hatchery)) +
+ggplot(sample_errs2, aes(x = hatchery)) +
   geom_bar(fill = "skyblue", color = "black") +
   labs(
     title = "Histogram of Sampling Hatchery Errors",
@@ -30,7 +30,7 @@ ggplot(sample_errs, aes(x = hatchery)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # Plot 3: Histogram of run year error counts
-ggplot(sample_errs, aes(x = run_year)) +
+ggplot(sample_errs3, aes(x = run_year)) +
   geom_bar(fill = "skyblue", color = "black") +
   labs(
     title = "Histogram of Run Years with Errors",
@@ -41,7 +41,7 @@ ggplot(sample_errs, aes(x = run_year)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # Plot 4: Histogram of fishery error counts
-ggplot(sample_errs, aes(x = mgt_fishery)) +
+ggplot(sample_errs3, aes(x = mgt_fishery)) +
   geom_bar(fill = "skyblue", color = "black") +
   labs(
     title = "Histogram of Fisheries with Errors",
@@ -51,7 +51,23 @@ ggplot(sample_errs, aes(x = mgt_fishery)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-# Plot 5: Plot of relative SARs (log-transformed)
+#plot 5: histogram of strata used in the relative sar calculation
+ggplot(model_inputs1, aes(x = mgt_fishery, fill = mgt_fishery %in% c("Escapement", "Buoy 10 Sport", "Freshwater Net"))) +
+  geom_bar(color = "black") +
+  scale_fill_manual(
+    values = c("TRUE" = "pink", "FALSE" = "skyblue"),
+    labels = c("TRUE" = "Included in analysis", "FALSE" = "Excluded from analysis")
+  ) +
+  labs(
+    title = "Number of recovery records by management fishery",
+    x = "Fishery",
+    y = "Number of Occurrences",
+    fill = "Strata"  
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+#plot 6: Plot of relative SARs (log-transformed)
 graphic_inputs <- model_inputs2 |> 
   group_by(hatchery, brood_year) |> 
   mutate(mean_sar = mean(relative_sar))
@@ -64,7 +80,7 @@ ggplot(graphic_inputs, aes(x = brood_year, y = log(mean_sar), color = hatchery, 
   ggtitle("Fall Chinook SAR by Brood Year and Hatchery") +
   theme_minimal()
 
-# Plot 6: Colorblind-friendly (log-transformed SAR)
+# Plot 7: Colorblind-friendly (log-transformed relative SAR)
 custom_colors <- c(
   "NORTH TOUTLE HATCHERY" = "gray",
   "COWLITZ SALMON HATCHERY" = "black",
@@ -95,7 +111,7 @@ ggplot(graphic_inputs, aes(x = brood_year, y = mean_sar, color = hatchery, group
   ggtitle("Fall Chinook SAR by Brood Year and Hatchery") +
   theme_minimal()
 
-#grouped and tiled barchart by year
+#grouped and tiled barchart by year for exploitation rates
 ggplot(fc, aes(x = brood_year, y = percent_rec)) +
   geom_bar(stat = "identity",
            aes(fill = fishery_name)

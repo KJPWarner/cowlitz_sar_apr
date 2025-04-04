@@ -82,7 +82,7 @@ spi2 <- spi |>
   mutate(run_year = as.character(run_year))
 
 
-########### clean up and tag recovery summations
+###########tag recovery summations
 model_inputs1 <- clean_rec2 |> 
   left_join(spi2, by = c("run_year", "escapement_location_name")) |> 
   janitor::clean_names() |> 
@@ -129,20 +129,25 @@ model_inputs1 <- clean_rec2 |>
 
 write.csv(model_inputs1,"./outputs/fall chinook locr sar data.csv")
 
-
 #### plots.r contains diagnostic histograms of frequency of errors in the sampling data. 
 #### upon examination, fisheries from CDFO, and returns from Big creek hatchery have been excluded from the relative sar analysis
 
-sample_errs <- model_inputs1 |> 
+sample_errs <- model_inputs1 |> #data frame of all erroneous sampling records.
   filter(sample_fraction > 1 | is.na(sample_fraction))
 
+sample_errs2 <- sample_errs |> 
+  filter(!sampling_agency == "CDFO")
+
+sample_errs3 <- sample_errs2 |> 
+  filter(!hatchery == "BIG CR HATCHERY")
 ######################## Final clean up and summation for modeling
 
 model_inputs2 <- model_inputs1 |> 
   filter(!sampling_agency == "CDFO",# problematic factors excluded to not introduce noise into the sar comparison
          !hatchery == "BIG CR HATCHERY", # same as above
-         !run_year == 2004) |> # again
-  mutate(raw_tags_recovered = 1) |> 
+         mgt_fishery %in% c("Escapement", "Buoy 10 Sport", "Freshwater Net")#chosen recovery strata based on frequency, magnitude, and comparison of Lower columbia hatchery pressures
+         ) |> 
+  mutate(raw_tags_recovered = 1) |> #every row in this dataset represents a single tag recovery
   mutate(expanded_cwt_best = coalesce(expanded_cwt_best,
                                       raw_tags_recovered)) |> # use raw number count when sampling expansions are not available
   filter(!expanded_cwt_best == Inf) |> ###exclude sampling fractions that are dividing by 0
