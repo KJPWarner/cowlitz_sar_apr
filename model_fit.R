@@ -3,7 +3,7 @@ pacman::p_load(tidyverse,
                mgcv,
                here,
                lubridate,
-               tidymv)
+               tidygam)
 
 # set plotting theme
 theme_set(theme_minimal())

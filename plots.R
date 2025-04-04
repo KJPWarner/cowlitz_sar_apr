@@ -5,7 +5,7 @@ if (!dir.exists("./figures")) {
 }
 
 #pdf device to save all plots
-pdf(file = "./figures/all_plots.pdf", width = 11, height = 8.5) # Standard landscape letter size
+pdf(file = "./figures/all_plots.pdf", width = 11, height = 8.5) #standard landscape letter size
 
 # plot 1- error histogram by sampling agency
 ggplot(sample_errs, aes(x = sampling_agency)) +
@@ -34,7 +34,7 @@ ggplot(sample_errs3, aes(x = run_year)) +
   geom_bar(fill = "skyblue", color = "black") +
   labs(
     title = "Histogram of Run Years with Errors",
-    x = "Year",
+    x = "Catch Year",
     y = "Number of Occurrences"
   ) +
   theme_minimal() +
@@ -110,21 +110,21 @@ ggplot(graphic_inputs, aes(x = brood_year, y = mean_sar, color = hatchery, group
   labs(x = "Brood Year", y = "SAR") +
   ggtitle("Fall Chinook SAR by Brood Year and Hatchery") +
   theme_minimal()
-
+##################################fisheries contribution plots
 #grouped and tiled barchart by year for exploitation rates
 
-fc2 <- fc |>
-  mutate(fishery_name = case_when(fishery_name %in% c("Hake Trawl Fishery, At-Sea component (CA/OR/WA)",
-                                       "Hake Trawl Fishery, Shoreside component (OR/WA)") ~ "Hake Trawl",
-                                  fishery_name %in% c("Sport (charter)",
-                                                      "Sport (private)") ~ "Offshore Sport",
-                                  fishery_name %in% c("Ocean Troll - Day Boat",
-                                                      "Ocean Troll (non-treaty)") ~"Ocean Troll",
-                   TRUE ~ fishery_name))
+#fc2 <- fc |>
+  # mutate(fishery_name = case_when(fishery_name %in% c("Hake Trawl Fishery, At-Sea component (CA/OR/WA)",
+  #                                      "Hake Trawl Fishery, Shoreside component (OR/WA)") ~ "Hake Trawl",
+  #                                 fishery_name %in% c("Sport (charter)",
+  #                                                     "Sport (private)") ~ "Offshore Sport",
+  #                                 fishery_name %in% c("Ocean Troll - Day Boat",
+  #                                                     "Ocean Troll (non-treaty)") ~"Ocean Troll",
+  #                  TRUE ~ fishery_name))
   
-ggplot(fc2, aes(x = brood_year, y = percent_rec)) +
+ggplot(fc, aes(x = brood_year, y = percent_rec)) +
   geom_bar(stat = "identity",
-           aes(fill = fishery_name)
+           aes(fill = mgt_fishery)
   ) +
   scale_fill_viridis_d(option = "C")+
   facet_wrap(~hatchery) +
@@ -132,6 +132,28 @@ ggplot(fc2, aes(x = brood_year, y = percent_rec)) +
        x = "Brood Year", 
        y = "Recovery by fishery (% total tags recovered by brood year)") +
   theme(legend.title = element_blank())#removes title from the legend
+
+# boxplot
+
+# Data Preparation: Calculate proportions for each fishery/year
+# fcb <- fc %>%
+#   g
+#   group_by(Year, Fishery) %>%
+#   mutate(Proportion = Recoveries / sum(Recoveries)) %>%
+#   ungroup()
+
+# Create boxplots using ggplot2
+ggplot(fc, aes(x = mgt_fishery, y = percent_rec)) +
+  geom_boxplot() +
+  labs(
+    title = "Distribution of recovery proportions across years and fishery",
+    x = "Fishery/Recovery Stratum",
+    y = "Proportion of total Cowlitz cwt recoveries"
+  ) +
+  scale_y_continuous(labels = scales::percent) +  # Optional: Show proportions as percentages
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 48, hjust = 1))
+
 
 #close PDF device
 dev.off()
