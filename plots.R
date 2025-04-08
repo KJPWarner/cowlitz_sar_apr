@@ -5,7 +5,7 @@ if (!dir.exists("./figures")) {
 }
 
 #pdf device to save all plots
-pdf(file = "./figures/all_plots.pdf", 
+pdf(file = "./figures/error_and_summary_plots.pdf", 
     width = 11,
     height = 8.5) #standard landscape letter size
 
@@ -162,23 +162,8 @@ ggplot(fc3, aes(x = brood_year, y = percent_rec)) +
     axis.text.x = element_text(angle = 45, hjust = 1) # Rotate x-axis labels if needed
   )
 
-#boxplot of fisheries exploitation
-# ggplot(fc, aes(x = mgt_fishery, y = percent_rec)) +
-#   geom_boxplot() +
-#   labs(
-#     title = "Distribution of recovery proportions across years and fishery",
-#     x = "Fishery/Recovery Stratum",
-#     y = "Proportion of total Cowlitz cwt recoveries"
-#   ) +
-#   scale_y_continuous(
-#                      trans = "log",
-#                      breaks = scales::breaks_pretty(),
-#                      limits = c(NA,1)) +  # Optional: Show proportions as percentages
-#   theme_minimal()+
-#   theme(axis.text.x = element_text(angle = 48, hjust = 1))
 
-
-#boxplot of porportion recoveries by fishery
+#boxplot of proportion recoveries by fishery
 ggplot(fc3, aes(x = fishery_name, y = percent_rec)) +
   geom_boxplot() +
   labs(
